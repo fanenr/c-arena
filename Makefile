@@ -9,7 +9,10 @@ all: test
 test: test.o arena.o
 	gcc $(LDFLAGS) -o $@ $^
 
-%.o: %.c
+arena.o: arena.c arena.h
+	gcc $(CFLAGS) -c $<
+
+test.o: test.c arena.h common.h
 	gcc $(CFLAGS) -c $<
 
 .PHONY: json
