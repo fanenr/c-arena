@@ -3,7 +3,8 @@
 
 #include <stddef.h>
 
-#define ARENA_BLOCK_SIZE 4096
+#define ARENA_PAGE_SIZE 4096
+#define ARENA_BLOCK_SIZE (8 * ARENA_PAGE_SIZE)
 #define ARENA_ALIGN_SIZE (2 * sizeof (void *))
 
 typedef struct arena_t arena_t;

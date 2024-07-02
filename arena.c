@@ -32,11 +32,11 @@ block_alloc (arena_t *pool)
           return false;
         }
 
-      newdata[pool->blocks.size++] = block;
       pool->blocks.data = newdata;
       pool->blocks.cap = newcap;
     }
 
+  pool->blocks.data[pool->blocks.size++] = block;
   pool->remain = ARENA_BLOCK_SIZE;
   pool->pos = block;
   return true;
@@ -63,12 +63,11 @@ huge_alloc (arena_t *pool, size_t size)
           return false;
         }
 
-      newdata[pool->blocks.size++] = block;
       pool->blocks.data = newdata;
       pool->blocks.cap = newcap;
     }
 
-  pool->pos = block;
+  pool->blocks.data[pool->blocks.size++] = block;
   pool->remain = 0;
   return block;
 }
