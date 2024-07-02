@@ -1,6 +1,8 @@
 #include "arena.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void *alloc (arena_t *pool, size_t size);
 
@@ -42,6 +44,13 @@ arena_alloc (arena_t *pool, size_t size)
 }
 
 void *
+arnea_realloc (arena_t *pool, void *oldptr, size_t oldsiz, size_t newsiz)
+{
+  void *ptr = arena_alloc (pool, newsiz);
+  return ptr ? memcpy (ptr, oldptr, oldsiz) : NULL;
+}
+
+void *
 arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
 {
   if (!size)
@@ -67,6 +76,14 @@ arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
   pool->remain -= size;
   pool->pos = ptr;
   return ptr;
+}
+
+void *
+arena_aligned_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
+                       size_t newsiz, size_t align)
+{
+  void *ptr = arena_aligned_alloc (pool, newsiz, align);
+  return ptr ? memcpy (ptr, oldptr, oldsiz) : NULL;
 }
 
 static inline void *
