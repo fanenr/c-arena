@@ -35,10 +35,10 @@ arena_alloc (arena_t *pool, size_t size)
   if (size > pool->remain && !block_alloc (pool))
     return NULL;
 
-  void *ret = pool->pos;
+  void *ptr = pool->end - size;
   pool->remain -= size;
-  pool->pos += size;
-  return ret;
+  pool->end = ptr;
+  return ptr;
 }
 
 void *
@@ -53,20 +53,20 @@ arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
   if (size >= ARENA_BLOCK_SIZE)
     return huge_alloc (pool, size);
 
-  size_t padding = align - (size_t)pool->pos % align;
-  padding = (padding == align) ? 0 : padding;
-  void *ret = pool->pos + padding;
+  size_t padding = (size_t)pool->pos % align;
+  padding = padding ? align - padding : 0;
+  void *ptr = pool->pos + padding;
 
   if (size + padding <= pool->remain)
     size += padding;
   else if (block_alloc (pool))
-    ret = pool->pos;
+    ptr = pool->pos;
   else
     return NULL;
 
   pool->remain -= size;
-  pool->pos += size;
-  return ret;
+  pool->pos = ptr;
+  return ptr;
 }
 
 static inline void *
@@ -94,6 +94,7 @@ alloc (arena_t *pool, size_t size)
     }
 
   data[pool->blocks.size++] = block;
+  pool->end = block + size;
   pool->remain = size;
   pool->pos = block;
   return block;

@@ -12,6 +12,7 @@ typedef struct arena_t arena_t;
 struct arena_t
 {
   void *pos;
+  void *end;
   size_t remain;
   struct
   {
@@ -28,6 +29,12 @@ void arena_free (arena_t *pool);
 
 void *arena_alloc (arena_t *pool, size_t size);
 
+void *arnea_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
+                     size_t newsiz);
+
 void *arena_aligned_alloc (arena_t *pool, size_t size, size_t align);
+
+void *arena_aligned_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
+                             size_t newsiz, size_t align);
 
 #endif
