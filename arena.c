@@ -2,6 +2,18 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+static void *alloc (arena_t *pool, size_t size);
+
+#define block_alloc(pool) alloc (pool, ARENA_BLOCK_SIZE)
+
+#define huge_alloc(pool, size)                                                \
+  ({                                                                          \
+    void *ptr;                                                                \
+    if ((ptr = alloc (pool, size)))                                           \
+      pool->remain = 0;                                                       \
+    ptr;                                                                      \
+  })
+
 void
 arena_free (arena_t *pool)
 {
@@ -9,67 +21,6 @@ arena_free (arena_t *pool)
     free (pool->blocks.data[i]);
   free (pool->blocks.data);
   *pool = ARENA_INIT;
-}
-
-bool
-block_alloc (arena_t *pool)
-{
-  void *block;
-
-  if (!(block = malloc (ARENA_BLOCK_SIZE)))
-    return false;
-
-  if (pool->blocks.size >= pool->blocks.cap)
-    {
-      void **newdata;
-      size_t cap = pool->blocks.cap;
-      void *data = pool->blocks.data;
-      size_t newcap = cap ? cap * 2 : 8;
-
-      if (!(newdata = realloc (data, newcap * sizeof (void *))))
-        {
-          free (block);
-          return false;
-        }
-
-      pool->blocks.data = newdata;
-      pool->blocks.cap = newcap;
-    }
-
-  pool->blocks.data[pool->blocks.size++] = block;
-  pool->remain = ARENA_BLOCK_SIZE;
-  pool->pos = block;
-  return true;
-}
-
-void *
-huge_alloc (arena_t *pool, size_t size)
-{
-  void *block;
-
-  if (!(block = malloc (size)))
-    return false;
-
-  if (pool->blocks.size >= pool->blocks.cap)
-    {
-      void **newdata;
-      size_t cap = pool->blocks.cap;
-      void *data = pool->blocks.data;
-      size_t newcap = cap ? cap * 2 : 8;
-
-      if (!(newdata = realloc (data, newcap * sizeof (void *))))
-        {
-          free (block);
-          return false;
-        }
-
-      pool->blocks.data = newdata;
-      pool->blocks.cap = newcap;
-    }
-
-  pool->blocks.data[pool->blocks.size++] = block;
-  pool->remain = 0;
-  return block;
 }
 
 void *
@@ -116,4 +67,34 @@ arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
   pool->remain -= size;
   pool->pos += size;
   return ret;
+}
+
+static inline void *
+alloc (arena_t *pool, size_t size)
+{
+  void *block;
+  void **data = pool->blocks.data;
+
+  if (!(block = malloc (size)))
+    return NULL;
+
+  if (pool->blocks.size >= pool->blocks.cap)
+    {
+      size_t cap = pool->blocks.cap;
+      cap = cap ? cap * 2 : 8;
+
+      if (!(data = realloc (data, cap * sizeof (void *))))
+        {
+          free (block);
+          return NULL;
+        }
+
+      pool->blocks.data = data;
+      pool->blocks.cap = cap;
+    }
+
+  data[pool->blocks.size++] = block;
+  pool->remain = size;
+  pool->pos = block;
+  return block;
 }
