@@ -68,9 +68,7 @@ arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
 
   if (size + padding <= pool->remain)
     size += padding;
-  else if (block_alloc (pool))
-    ptr = pool->pos;
-  else
+  else if (!(ptr = block_alloc (pool)))
     return NULL;
 
   pool->remain -= size;
