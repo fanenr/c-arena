@@ -7,6 +7,8 @@
 #define ARENA_BLOCK_SIZE (8 * ARENA_PAGE_SIZE)
 #define ARENA_ALIGN_SIZE (2 * sizeof (void *))
 
+#define attr_nonnull(...) __attribute__ ((nonnull (__VA_ARGS__)))
+
 typedef struct arena_t arena_t;
 
 struct arena_t
@@ -25,16 +27,18 @@ struct arena_t
 #define ARENA_INIT                                                            \
   (arena_t) {}
 
-void arena_free (arena_t *pool);
+extern void arena_free (arena_t *pool) attr_nonnull (1);
 
-void *arena_alloc (arena_t *pool, size_t size);
+extern void *arena_alloc (arena_t *pool, size_t size) attr_nonnull (1);
 
-void *arnea_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
-                     size_t newsiz);
+extern void *arnea_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
+                            size_t newsiz) attr_nonnull (1);
 
-void *arena_aligned_alloc (arena_t *pool, size_t size, size_t align);
+extern void *arena_aligned_alloc (arena_t *pool, size_t size, size_t align)
+    attr_nonnull (1);
 
-void *arena_aligned_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
-                             size_t newsiz, size_t align);
+extern void *arena_aligned_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
+                                    size_t newsiz, size_t align)
+    attr_nonnull (1);
 
 #endif

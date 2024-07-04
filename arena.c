@@ -47,7 +47,14 @@ void *
 arnea_realloc (arena_t *pool, void *oldptr, size_t oldsiz, size_t newsiz)
 {
   void *ptr = arena_alloc (pool, newsiz);
-  return ptr ? memcpy (ptr, oldptr, oldsiz) : NULL;
+
+  if (!ptr)
+    return NULL;
+
+  if (oldptr && oldsiz)
+    memcpy (ptr, oldptr, oldsiz);
+
+  return ptr;
 }
 
 void *
@@ -81,7 +88,14 @@ arena_aligned_realloc (arena_t *pool, void *oldptr, size_t oldsiz,
                        size_t newsiz, size_t align)
 {
   void *ptr = arena_aligned_alloc (pool, newsiz, align);
-  return ptr ? memcpy (ptr, oldptr, oldsiz) : NULL;
+
+  if (!ptr)
+    return NULL;
+
+  if (oldptr && oldsiz)
+    memcpy (ptr, oldptr, oldsiz);
+
+  return ptr;
 }
 
 static inline void *
