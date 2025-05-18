@@ -114,9 +114,9 @@ test7 (void)
       size_t size = rand_long (0, max_size);
       size_t align = rand_long (0, aligns_size);
       if (rand_long (0, 2))
-        test_alloc (&pool, size);
+	test_alloc (&pool, size);
       else
-        test_aligned_alloc (&pool, size, aligns[align]);
+	test_aligned_alloc (&pool, size, aligns[align]);
     }
 
   arena_free (&pool);
@@ -134,9 +134,9 @@ test8 (void)
       size_t align = rand_long (0, aligns_size);
       size_t size = rand_long (min_size, max_size);
       if (rand_long (0, 2))
-        test_alloc (&pool, size);
+	test_alloc (&pool, size);
       else
-        test_aligned_alloc (&pool, size, aligns[align]);
+	test_aligned_alloc (&pool, size, aligns[align]);
     }
 
   arena_free (&pool);
@@ -153,9 +153,9 @@ test9 (void)
       size_t size = rand_long (0, max_size);
       size_t align = rand_long (0, aligns_size);
       if (rand_long (0, 2))
-        test_alloc (&pool, size);
+	test_alloc (&pool, size);
       else
-        test_aligned_alloc (&pool, size, aligns[align]);
+	test_aligned_alloc (&pool, size, aligns[align]);
     }
 
   arena_free (&pool);
@@ -196,6 +196,6 @@ test_aligned_alloc (arena_t *pool, size_t size, size_t align)
   void *ptr = arena_aligned_alloc (pool, size, align);
   assert ((size && ptr) || (!size && !ptr));
   align = align ? align : ARENA_ALIGN_SIZE;
-  assert ((size_t)ptr % align == 0);
+  assert ((size_t) ptr % align == 0);
   memset (ptr, 0, size);
 }
